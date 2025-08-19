@@ -1,6 +1,7 @@
 import re
 
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
@@ -14,15 +15,19 @@ def validate_license_number(value: str):
         )
 
 
-class DriverForm(forms.ModelForm):
+User = get_user_model()
+
+
+class DriverCreationForm(UserCreationForm):
     license_number = forms.CharField(
-        max_length=8 ,
+        max_length=8,
+        required=True,
         validators=[validate_license_number],
     )
 
-    class Meta:
-        model = Driver
-        fields = "__all__"
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = UserCreationForm.Meta.fields + ("license_number",)
 
 
 class DriverLicenseUpdateForm(forms.ModelForm):
